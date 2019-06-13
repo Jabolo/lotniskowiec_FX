@@ -1,43 +1,49 @@
 package sample;
 
 import javafx.animation.PathTransition;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.CubicCurveTo;
-import javafx.scene.shape.MoveTo;
-import javafx.scene.shape.Path;
+import javafx.application.Platform;
+import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.shape.*;
 import javafx.util.Duration;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
 public class Carrier extends Thread {
     private static volatile Object runaway = new Object();
     private static volatile Lock access = new ReentrantLock();
 
     volatile private int on_board;
-    volatile private int on_board_waiting = 0;
-    volatile private int in_the_air = 0;
-    volatile private int in_the_air_waiting = 0;
+    volatile private int on_board_waiting;
+    volatile public int in_the_air;
+    volatile private int in_the_air_waiting;
 
     private int capacity; //who is right
     private int num_of_aircrafts;
-    private int K; //who is right
+    private int K; //who is right;
+    Label lob;
+    Label lobw;
+    Label lita;
+    Label litaw;
 
-
-    public Carrier(int capacity, int on_board, int K) {
+    public Carrier(int capacity, int on_board, int K, Label ob, Label obw, Label ita, Label itaw) {
         this.capacity = capacity;
         this.on_board = on_board;
         this.K = K;
-
         this.num_of_aircrafts = on_board;
+        this.lob = ob;
+        this.lobw = obw;
+        this.lita = ita;
+        this.litaw = itaw;
     }
 
-    public void take_of(Circle plane, AnchorPane anchorRoot) throws InterruptedException {
-        access.lock();
+    public void take_off(Circle plane) throws InterruptedException {
         on_board_waiting++;
-
-        if ((K < capacity) && (in_the_air_waiting > 0)) {
+        Platform.runLater(() -> {
+            lobw.setText("" + on_board_waiting);
+        });
+        access.lock();
+        while (K < capacity && in_the_air_waiting > 0) {
             access.unlock();
             synchronized (runaway) {
                 runaway.wait();
@@ -46,45 +52,44 @@ public class Carrier extends Thread {
         }
 
         on_board_waiting--;
+        Platform.runLater(() -> {
+            lobw.setText("" + on_board_waiting);
+        });
         on_board--;
+        Platform.runLater(() -> {
+            lob.setText("" + on_board);
+        });
         in_the_air++;
+        Platform.runLater(() -> {
+            lita.setText("" + in_the_air);
+        });
 
+
+        System.out.println("In the air:" + in_the_air);
 
         //pathTransition.setCycleCount(Timeline.INDEFINITE);
         //pathTransition.setAutoReverse(true);
-//        Platform.runLater(() -> {
-//            pathTransition.play();
-//        });
 //
 //        pathTransition.setOnFinished((lambda) -> {runaway.notifyAll();});
-//        synchronized (runaway) {
-//            runaway.notifyAll();
-//        }
-        int time = (int) (Math.random() * 5000 + 2000);
+        int time_take_off = (int) (2000);
 
-        Path path = new Path();
-        path.getElements().add(new MoveTo((int) (Math.random() * 60), (int) (Math.random() * 60)));
-        path.getElements().add(new CubicCurveTo(380, 0, 380, 120, 200, 120));
-        path.getElements().add(new CubicCurveTo(0, 120, 0, 240, 380, 240));
-        PathTransition pathTransition = new PathTransition();
-        pathTransition.setDuration(Duration.millis(time));
-        pathTransition.setPath(path);
-        pathTransition.setNode(plane);
-        pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
-        pathTransition.play();
-        sleep(2000);
-        access.unlock();
-
+        animation_take_off(plane, time_take_off);
+        sleep(time_take_off);
 
         synchronized (runaway) {
             runaway.notifyAll();
         }
+        access.unlock();
     }
 
-    public void landing() throws InterruptedException {
-        access.lock();
+    public void landing(Circle plane) throws InterruptedException {
         in_the_air_waiting++;
-        if ((K > capacity) && (on_board_waiting > 0)) {
+        Platform.runLater(() -> {
+            litaw.setText("" + in_the_air_waiting);
+        });
+        access.lock();
+
+        while ((K > capacity) && (on_board_waiting > 0)) {
             access.unlock();
             synchronized (runaway) {
                 runaway.wait();
@@ -92,11 +97,63 @@ public class Carrier extends Thread {
             access.lock();
         }
         in_the_air_waiting--;
+        Platform.runLater(() -> {
+            litaw.setText("" + in_the_air_waiting);
+        });
+
+        System.out.println("Wanna land, my current position:" + plane.getCenterX() + " " + plane.getCenterY());
+        int time_landing = (int) (2000);
+        animation_landing(plane, time_landing);
+        sleep(time_landing);
+
         in_the_air--;
+        Platform.runLater(() -> {
+            lita.setText("" + in_the_air);
+        });
         on_board++;
+        Platform.runLater(() -> {
+            lob.setText("" + on_board);
+        });
+
         synchronized (runaway) {
             runaway.notifyAll();
         }
         access.unlock();
+    }
+
+    private void animation_take_off(Node plane, int time_take_off) {
+        Path path = new Path();
+        path.getElements().add(new MoveTo(500, 75));
+        path.getElements().add(new LineTo(500, 300));
+        path.getElements().add(new CubicCurveTo(500, 475, 410, 475, 250, 475));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(time_take_off));
+        pathTransition.setPath(path);
+        pathTransition.setNode(plane);
+        pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+        Platform.runLater(() -> {
+            pathTransition.play();
+        });
+
+    }
+
+    private void animation_landing(Node plane, int time_landing) {
+        Path path = new Path();
+//        path.getElements().add(new LineTo(500, 300));
+//        path.getElements().add(new CubicCurveTo( 500, 475, 410, 475, 250, 475));
+
+
+        path.getElements().add(new MoveTo(250, 475));
+        path.getElements().add(new CubicCurveTo(50, 475, 150, 300, 350, 420));
+        path.getElements().add(new CubicCurveTo(450, 475, 500, 475, 500, 300));
+        path.getElements().add(new LineTo(500, 75));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(time_landing));
+        pathTransition.setPath(path);
+        pathTransition.setNode(plane);
+        pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+        Platform.runLater(() -> {
+            pathTransition.play();
+        });
     }
 }

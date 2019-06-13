@@ -8,7 +8,7 @@ public class Aircraft extends Thread {
     private final int numer;
     private final int flights_to_fly;
     private Carrier carrier;
-    Circle plane = new Circle(5, Color.RED);
+    Circle plane = new Circle(8);
     AnchorPane anchorRoot;
 
 //    @FXML
@@ -20,7 +20,7 @@ public class Aircraft extends Thread {
         this.numer = numer;
         this.flights_to_fly = flights_to_fly;
         this.anchorRoot = anchorRoot;
-
+        plane.setFill(Color.color(Math.random(), Math.random(), Math.random()));
         anchorRoot.getChildren().add(plane);
 
     }
@@ -31,13 +31,13 @@ public class Aircraft extends Thread {
 
             //wait 4 start
             try {
-                Thread.sleep((long) (Math.random() * 10) + 1000);
+                Thread.sleep((long) (Math.random() * 4000) + 2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("+++ [" + Thread.currentThread().getName() + "] :: wanna_take_of");
+            System.out.println("+++ [" + Thread.currentThread().getName() + "] :: wanna_take_off");
             try {
-                carrier.take_of(plane, anchorRoot);
+                carrier.take_off(plane);
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -45,19 +45,19 @@ public class Aircraft extends Thread {
 
             //flight
             try {
-                Thread.sleep((long) (Math.random() * 1000) + 10);
+                Thread.sleep((long) (Math.random() * 10000) + 5);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("--- [" + Thread.currentThread().getName() + "] :: flies");
+            System.out.println("--- [" + Thread.currentThread().getName() + "] :: wanna land");
 
             //landing
             try {
-                carrier.landing();
+                carrier.landing(plane);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("___ [" + Thread.currentThread().getName() + "] :: is landing");
+            System.out.println("___ [" + Thread.currentThread().getName() + "] :: has just landed");
 
         }
     }

@@ -14,7 +14,6 @@ public class Main extends Application {
         primaryStage.setTitle("Aircafts_Carrier");
         primaryStage.setScene(new Scene(root, 600, 600));
         primaryStage.show();
-
     }
 
     public static void main(String[] args) throws InterruptedException {
