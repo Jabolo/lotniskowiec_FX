@@ -27,11 +27,12 @@ public class Controller implements Initializable {
         int M = 10;
         int K = 1; //who has right
         int flights_to_fly = 2;
+        int time = 4000;
 
-        Carrier carier = new Carrier(N, M, K, label_on_board, label_waiting_for_take_off, label_in_the_air, label_waiting_for_landing);
+        Carrier carier = new Carrier(N, M, K, time, label_on_board, label_waiting_for_take_off, label_in_the_air, label_waiting_for_landing);
         Aircraft[] aircraft = new Aircraft[M];
 
-        for (int i = 0; i < M; i++) aircraft[i] = new Aircraft(carier, i, flights_to_fly, anchorRoot);
+        for (int i = 0; i < M; i++) aircraft[i] = new Aircraft(carier, i, flights_to_fly, anchorRoot, time);
         for (int i = 0; i < M; i++) aircraft[i].start();
 
         //carier.getIn_the_air().addListener(new ChangeListener());

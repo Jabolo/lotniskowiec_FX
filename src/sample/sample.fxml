@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.shape.CubicCurve?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
@@ -22,7 +21,7 @@
                 <Line endY="200.0" layoutX="100.0" layoutY="50.0" stroke="WHITE"/>
             </children>
         </AnchorPane>
-        <AnchorPane layoutY="532.0" prefHeight="67.0" prefWidth="600.0"
+        <AnchorPane layoutY="525.0" prefHeight="75.0" prefWidth="600.0"
                     style="-fx-background-color: NAVY; -fx-border-color: WHITE; -fx-border-width: 5;">
             <children>
                 <Label layoutX="388.0" layoutY="33.0" text="wainting for take off:" textFill="WHITE">
@@ -71,9 +70,5 @@
                 </Label>
             </children>
         </AnchorPane>
-        <CubicCurve fx:id="take_off_B" controlX1="399.4999694824219" controlX2="311.9999694824219"
-                    controlY1="233.66665649414062" controlY2="233.66665649414062" endX="220.66665649414062"
-                    endY="233.66665649414062" fill="DODGERBLUE" layoutX="100.0" layoutY="271.0"
-                    startX="399.4999694824219" startY="29.5" stroke="BLACK"/>
     </children>
 </AnchorPane>
