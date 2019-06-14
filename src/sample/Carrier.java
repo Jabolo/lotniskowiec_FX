@@ -47,7 +47,7 @@ public class Carrier extends Thread {
             lobw.setText("" + on_board_waiting);
         });
         access.lock();
-        while (K < capacity && in_the_air_waiting > 0) {
+        if (K < capacity && in_the_air_waiting > 0) {
             access.unlock();
             synchronized (runaway) {
                 runaway.wait();
@@ -68,9 +68,6 @@ public class Carrier extends Thread {
             lita.setText("" + in_the_air);
         });
 
-
-        System.out.println("In the air:" + in_the_air);
-
         //pathTransition.setCycleCount(Timeline.INDEFINITE);
         //pathTransition.setAutoReverse(true);
 //
@@ -87,23 +84,32 @@ public class Carrier extends Thread {
 
     public void landing(Circle plane) throws InterruptedException {
         in_the_air_waiting++;
+
+        animation_flying(plane, time_each_animation);
         Platform.runLater(() -> {
             litaw.setText("" + in_the_air_waiting);
         });
+        //chiałbym tutaj latać dopóki nie zalokuje
         access.lock();
+        System.out.println(Thread.currentThread().getName() + " ktoś mnie wołał ??? a ja czekam na lądowanie");
         while ((K > capacity) && (on_board_waiting > 0)) {
             access.unlock();
+            animation_flying(plane, time_each_animation);
+
             synchronized (runaway) {
+                System.out.println(Thread.currentThread().getName() + " czy to będzie się kręcić");
+                animation_flying(plane, time_each_animation);
                 runaway.wait();
             }
             access.lock();
         }
+        stop();
         in_the_air_waiting--;
         Platform.runLater(() -> {
             litaw.setText("" + in_the_air_waiting);
         });
-        animation_landing(plane, time_each_animation);
-        sleep(time_each_animation);
+
+
         in_the_air--;
         Platform.runLater(() -> {
             lita.setText("" + in_the_air);
@@ -112,6 +118,9 @@ public class Carrier extends Thread {
         Platform.runLater(() -> {
             lob.setText("" + on_board);
         });
+        animation_landing(plane, time_each_animation);
+        sleep(time_each_animation);
+
         synchronized (runaway) {
             runaway.notifyAll();
         }
@@ -148,24 +157,34 @@ public class Carrier extends Thread {
         Platform.runLater(() -> {
             pathTransition.play();
         });
+
+
     }
 
     public void animation_flying(Node plane, int time_to_fly) {
         Path path = new Path();
         path.getElements().add(new MoveTo(250, 475));
-        path.getElements().add(new QuadCurveTo(50, 475, 50, 300));
-        path.getElements().add(new QuadCurveTo(50, 75, 175, 75));
-        path.getElements().add(new QuadCurveTo(300, 75, 300, 300));
-        path.getElements().add(new QuadCurveTo(300, 475, 250, 475));
-        //path.getElements().add(new CubicCurveTo(, 475, 500, 475, 500, 300));
-        //path.getElements().add(new LineTo(500, 75));
+        double zbiorczyX = Math.random() * 350 + 50;
+        double zbiorczyY = Math.random() * 200 + 50;
 
+        if (zbiorczyX < 100) {
+            path.getElements().add(new QuadCurveTo(50, 475, 50, 300));
+            path.getElements().add(new QuadCurveTo(50, 75, 175, 75));
+            path.getElements().add(new QuadCurveTo(300, 75, 300, 300));
+            path.getElements().add(new QuadCurveTo(300, 475, 250, 475));
+        } else {
+            path.getElements().add(new CubicCurveTo(Math.random() * 200 + 50, Math.random() * 200 + 50,
+                    Math.random() * 200 + 50, Math.random() * 200 + 200, zbiorczyX, zbiorczyY));
+            path.getElements().add(new CubicCurveTo(Math.random() * 250 + 100, Math.random() * 100 + 200,
+                    Math.random() * 300 + 75, Math.random() * 175 + 300, 250, 475));
+        }
 
         PathTransition pathTransition = new PathTransition();
         pathTransition.setDuration(Duration.millis(time_to_fly));
         pathTransition.setPath(path);
         pathTransition.setNode(plane);
         pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
+        pathTransition.setCycleCount(10);
         Platform.runLater(() -> {
             pathTransition.play();
         });

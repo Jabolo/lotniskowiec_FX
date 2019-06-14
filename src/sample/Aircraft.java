@@ -34,7 +34,7 @@ public class Aircraft extends Thread {
 
             //wait 4 start
             try {
-                Thread.sleep((long) (Math.random() * 4000) + 2000);
+                Thread.sleep((long) (Math.random() * 2000) + 200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -52,7 +52,7 @@ public class Aircraft extends Thread {
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
-            carrier.animation_flying(plane, time);
+            //carrier.animation_flying(plane, time);
             System.out.println("--- [" + Thread.currentThread().getName() + "] :: wanna land");
 
             //landing
