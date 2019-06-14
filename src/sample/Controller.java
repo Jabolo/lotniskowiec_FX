@@ -3,6 +3,7 @@ package sample;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.AnchorPane;
@@ -26,17 +27,24 @@ public class Controller implements Initializable {
     Button Start;
     @FXML
     Slider NumOfPlanes;
+    @FXML
+    Slider Speed;
+    @FXML
+    CheckBox LandingFirst;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         Start.setOnAction((event) -> {
             int N = 15;
             int M = (int) NumOfPlanes.getValue();
-            int K = 16; //who has right
-            int flights_to_fly = 2;
-            int time = 2000;
-
+            int flights_to_fly = 15;
+            int time = 10000 / (int) (Speed.getValue());
+            int K;
+            if (LandingFirst.isSelected()) K = 1;
+            else K = 16;
             NumOfPlanes.setDisable(true);
+            Speed.setDisable(true);
+            LandingFirst.setDisable(true);
             Start.setDisable(true);
             Carrier carier = new Carrier(N, M, K, time, label_on_board, label_waiting_for_take_off, label_in_the_air, label_waiting_for_landing);
             Aircraft[] aircraft = new Aircraft[M];
