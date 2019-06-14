@@ -47,7 +47,7 @@ public class Carrier extends Thread {
             lobw.setText("" + on_board_waiting);
         });
         access.lock();
-        if (K < capacity && in_the_air_waiting > 0) {
+        while (K < capacity && in_the_air_waiting > 0) {
             access.unlock();
             synchronized (runaway) {
                 runaway.wait();
@@ -68,11 +68,6 @@ public class Carrier extends Thread {
             lita.setText("" + in_the_air);
         });
 
-        //pathTransition.setCycleCount(Timeline.INDEFINITE);
-        //pathTransition.setAutoReverse(true);
-//
-//        pathTransition.setOnFinished((lambda) -> {runaway.notifyAll();});
-
         animation_take_off(plane, time_each_animation);
         sleep(time_each_animation);
 
@@ -83,32 +78,32 @@ public class Carrier extends Thread {
     }
 
     public void landing(Circle plane) throws InterruptedException {
-        in_the_air_waiting++;
 
-        animation_flying(plane, time_each_animation);
+        in_the_air_waiting++;
         Platform.runLater(() -> {
             litaw.setText("" + in_the_air_waiting);
         });
-        //chiałbym tutaj latać dopóki nie zalokuje
-        access.lock();
-        System.out.println(Thread.currentThread().getName() + " ktoś mnie wołał ??? a ja czekam na lądowanie");
+        while (!access.tryLock()) {
+            animation_flying(plane, time_each_animation);
+            //System.out.println(Thread.currentThread().getName() + "at try lock");
+
+            sleep(time_each_animation);
+
+        }
         while ((K > capacity) && (on_board_waiting > 0)) {
             access.unlock();
-            animation_flying(plane, time_each_animation);
-
             synchronized (runaway) {
-                System.out.println(Thread.currentThread().getName() + " czy to będzie się kręcić");
                 animation_flying(plane, time_each_animation);
+                //System.out.println(Thread.currentThread().getName() + "synchronized");
+                //sleep(time_each_animation);
                 runaway.wait();
             }
             access.lock();
         }
-        stop();
         in_the_air_waiting--;
         Platform.runLater(() -> {
             litaw.setText("" + in_the_air_waiting);
         });
-
 
         in_the_air--;
         Platform.runLater(() -> {
@@ -118,6 +113,7 @@ public class Carrier extends Thread {
         Platform.runLater(() -> {
             lob.setText("" + on_board);
         });
+
         animation_landing(plane, time_each_animation);
         sleep(time_each_animation);
 
@@ -184,7 +180,7 @@ public class Carrier extends Thread {
         pathTransition.setPath(path);
         pathTransition.setNode(plane);
         pathTransition.setOrientation(PathTransition.OrientationType.ORTHOGONAL_TO_TANGENT);
-        pathTransition.setCycleCount(10);
+        pathTransition.setCycleCount(1);
         Platform.runLater(() -> {
             pathTransition.play();
         });

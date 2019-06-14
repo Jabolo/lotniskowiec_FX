@@ -40,8 +40,14 @@ public class Controller implements Initializable {
             int flights_to_fly = 15;
             int time = 10000 / (int) (Speed.getValue());
             int K;
-            if (LandingFirst.isSelected()) K = 1;
-            else K = 16;
+            if (LandingFirst.isSelected()) {
+                K = 1;
+                System.out.printf("Landing first");
+            } else {
+                K = 16;
+                System.out.printf("Taking off first");
+            }
+
             NumOfPlanes.setDisable(true);
             Speed.setDisable(true);
             LandingFirst.setDisable(true);
@@ -52,9 +58,6 @@ public class Controller implements Initializable {
             for (int i = 0; i < M; i++) aircraft[i] = new Aircraft(carier, i, flights_to_fly, anchorRoot, time);
             for (int i = 0; i < M; i++) aircraft[i].start();
 
-            //carier.getIn_the_air().addListener(new ChangeListener());
-            //label_in_the_air.textProperty().bind(new SimpleIntegerProperty(carier.getIn_the_air()).asString());
-            //label_in_the_air.textProperty().bind(new SimpleIntegerProperty(carier.in_the_air).asString());
             //join makes all the graphic to wait till end od of "threads"
         });
     }
