@@ -32,13 +32,12 @@ public class Aircraft extends Thread {
         for (int i = 0; i < flights_to_fly; i++) {
 
 
-            //wait 4 start
+            //wait for start
             try {
                 Thread.sleep((int) (Math.random() * 3) + time);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            System.out.println("+++ [" + Thread.currentThread().getName() + "] :: wanna_take_off");
             try {
                 carrier.take_off(plane);
 
@@ -46,7 +45,14 @@ public class Aircraft extends Thread {
                 e.printStackTrace();
             }
 
-            System.out.println("--- [" + Thread.currentThread().getName() + "] :: wanna land");
+            for (int j = 0; j < (int) (Math.random() * 5 + 2); j++) {
+                try {
+                    carrier.animation_flying(plane, time);
+                    sleep(time);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
 
             //landing
             try {
@@ -55,9 +61,6 @@ public class Aircraft extends Thread {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            System.out.println("___ [" + Thread.currentThread().getName() + "] :: has just landed");
-
         }
     }
 }

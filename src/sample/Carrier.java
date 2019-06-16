@@ -19,7 +19,7 @@ public class Carrier extends Thread {
     volatile public int in_the_air;
     volatile private int in_the_air_waiting;
 
-    private int capacity; //who is right
+    private int capacity; //const
     private int num_of_aircrafts;
     private int K; //who is right;
 
@@ -43,9 +43,6 @@ public class Carrier extends Thread {
 
     public void take_off(Circle plane) throws InterruptedException {
         on_board_waiting++;
-        Platform.runLater(() -> {
-            lobw.setText("" + on_board_waiting);
-        });
         access.lock();
         while (K < capacity && in_the_air_waiting > 0) {
             access.unlock();
@@ -85,20 +82,24 @@ public class Carrier extends Thread {
         });
         while (!access.tryLock()) {
             animation_flying(plane, time_each_animation);
-            //System.out.println(Thread.currentThread().getName() + "at try lock");
-
             sleep(time_each_animation);
-
         }
         while ((K > capacity) && (on_board_waiting > 0)) {
             access.unlock();
             synchronized (runaway) {
                 animation_flying(plane, time_each_animation);
-                //System.out.println(Thread.currentThread().getName() + "synchronized");
-                //sleep(time_each_animation);
+                sleep(time_each_animation);
                 runaway.wait();
             }
             access.lock();
+        }
+
+
+        animation_landing(plane, time_each_animation);
+        sleep(time_each_animation);
+
+        synchronized (runaway) {
+            runaway.notifyAll();
         }
         in_the_air_waiting--;
         Platform.runLater(() -> {
@@ -113,13 +114,6 @@ public class Carrier extends Thread {
         Platform.runLater(() -> {
             lob.setText("" + on_board);
         });
-
-        animation_landing(plane, time_each_animation);
-        sleep(time_each_animation);
-
-        synchronized (runaway) {
-            runaway.notifyAll();
-        }
         access.unlock();
     }
 

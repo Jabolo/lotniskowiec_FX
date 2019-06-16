@@ -13,8 +13,7 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
-    @FXML
-    private AnchorPane anchorRoot;
+
     @FXML
     Label label_on_board;
     @FXML
@@ -30,6 +29,8 @@ public class Controller implements Initializable {
     @FXML
     Slider Speed;
     @FXML
+    private AnchorPane anchorRoot;
+    @FXML
     CheckBox LandingFirst;
 
     @Override
@@ -42,10 +43,10 @@ public class Controller implements Initializable {
             int K;
             if (LandingFirst.isSelected()) {
                 K = 1;
-                System.out.printf("Landing first");
+                System.out.println("Landing first");
             } else {
                 K = 16;
-                System.out.printf("Taking off first");
+                System.out.println("Taking off first");
             }
 
             NumOfPlanes.setDisable(true);
